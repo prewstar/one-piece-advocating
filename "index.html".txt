@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Piece Self-Advocacy</title>
+    <!-- Use a custom font to make it pop! -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+    <!-- Tailwind CSS for super-fast styling and responsiveness -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0e9d6;
+            background-image: url('https://placehold.co/1920x1080/f0e9d6/f0e9d6?text=.');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-container {
+            position: relative;
+            background-color: #ffffffc0; /* Semi-transparent background */
+            backdrop-filter: blur(10px); /* Frosted glass effect */
+            border-radius: 2rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            max-width: 90%;
+            width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        /* Styles for the "parchment" look */
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 2px solid #5a4b3f;
+            border-radius: 2rem;
+            pointer-events: none; /* Ignore mouse events */
+        }
+
+        /* Basic animation for elements */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .character-icon {
+            font-size: 4rem;
+            animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        @keyframes bounceIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Custom button styling */
+        .game-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 1.5rem;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: block;
+            width: 100%;
+            margin-bottom: 0.75rem;
+        }
+
+        .game-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .shop-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8f0dd;
+            padding: 1rem;
+            border-radius: 1rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 0.75rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main game container -->
+    <div class="game-container">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="fade-in flex flex-col items-center justify-center gap-6">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 tracking-tight leading-tight">
+                One Piece <br> Self-Advocacy
+            </h1>
+            <p class="text-gray-600 text-lg">
+                Join the Straw Hat crew and navigate the Grand Line! Your choices matter. Make sure your voice is heard and you stand up for yourself and others.
+            </p>
+            <p class="text-sm text-gray-400 mt-2">Made by H Darbyshire</p>
+            <button id="start-btn" class="game-btn bg-yellow-500 text-white hover:bg-yellow-600">
+                Set Sail! 🏴‍☠️
+            </button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden fade-in flex flex-col items-center gap-4">
+            <div id="character-display" class="flex flex-col items-center gap-2">
+                <div id="character-icon" class="character-icon"></div>
+                <div id="character-name" class="font-bold text-xl text-gray-800"></div>
+            </div>
+            
+            <p id="scenario-text" class="text-lg text-gray-700"></p>
+            
+            <div id="choices-container" class="w-full mt-4 flex flex-col items-center">
+                <!-- Choice buttons will be dynamically added here -->
+            </div>
+
+            <div id="feedback-container" class="hidden mt-4 p-4 rounded-xl shadow-inner border border-gray-200">
+                <p id="feedback-text" class="text-gray-600"></p>
+                <!-- New "Next" button -->
+                <button id="next-btn" class="game-btn bg-blue-500 text-white hover:bg-blue-600 mt-4 hidden">
+                    Next Scenario
+                </button>
+            </div>
+            
+            <!-- Score Display -->
+            <div class="absolute top-4 right-4 bg-white/70 backdrop-blur-md p-2 rounded-full shadow-lg flex items-center gap-2 text-gray-800 font-bold text-sm md:text-base">
+                <span class="text-xl">💰</span>
+                <span id="score-text">Score: 0</span>
+            </div>
+        </div>
+        
+        <!-- Shop Screen -->
+        <div id="shop-screen" class="hidden fade-in flex flex-col items-center justify-center gap-6">
+            <h2 class="text-3xl font-bold text-gray-800">The Grand Line Trading Post</h2>
+            <!-- Display player's current gold -->
+            <p id="shop-gold-display" class="text-2xl text-yellow-600 font-bold -mt-4">
+                💰 0 Gold
+            </p>
+            <p class="text-gray-600">Spend your gold on some treasures!</p>
+            <div id="shop-items-container" class="w-full">
+                <!-- Shop items will be added here -->
+            </div>
+            <p id="shop-message" class="text-lg text-green-600 hidden"></p>
+            <button id="shop-continue-btn" class="game-btn bg-yellow-500 text-white hover:bg-yellow-600 mt-4">
+                Continue the Journey
+            </button>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen" class="hidden fade-in flex flex-col items-center justify-center gap-6">
+            <h2 id="final-message" class="text-4xl font-bold text-gray-800"></h2>
+            <p id="final-score" class="text-2xl text-gray-700"></p>
+            <button id="restart-btn" class="game-btn bg-blue-500 text-white hover:bg-blue-600">
+                Play Again
+            </button>
+        </div>
+
+        <!-- Message Box for Alerts -->
+        <div id="message-box" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full text-center">
+                <p id="message-box-text" class="text-xl mb-4 text-gray-800"></p>
+                <button id="message-box-ok" class="game-btn bg-red-500 text-white hover:bg-red-600">OK</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Fisher-Yates shuffle algorithm to randomize array order
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Game State
+        const scenarios = [
+            {
+                character: "Zoro ⚔️",
+                name: "Zoro",
+                text: "Zoro is training with his weights, blocking your path to the galley. You're hungry and need to get through.",
+                choices: [
+                    {
+                        text: "Just walk around him and forget about eating for a bit.",
+                        isSelfAdvocacy: false,
+                        resultText: "You decided to wait, but your hunger only grew. It's okay to ask for what you need respectfully."
+                    },
+                    {
+                        text: "Hey, Zoro! Can you move for a sec? I'm starving and need to get to the galley.",
+                        isSelfAdvocacy: true,
+                        reward: 10,
+                        resultText: "Zoro grunts, but moves his weights. He respects that you spoke up for yourself. You gain 10 gold."
+                    }
+                ]
+            },
+            {
+                character: "Sanji 🍲",
+                name: "Sanji",
+                text: "Sanji has prepared a feast, but one of the dishes has an ingredient you're allergic to. He's very proud of his work.",
+                choices: [
+                    {
+                        text: "This looks amazing, Sanji! I just want to let you know I'm allergic to [ingredient], so I'll need to skip this one. Thank you so much for the delicious meal!",
+                        isSelfAdvocacy: false,
+                        resultText: "Sanji doesn't like it when you don't eat his food and he has got really angry."
+                    },
+                    {
+                        text: "This looks amazing, Sanji! I'm allergic to [ingredient], but I would love to help you cook another meal with different ingredients so I can still eat your food.",
+                        isSelfAdvocacy: true,
+                        reward: 10,
+                        resultText: "Sanji understands completely and makes a new plate with you! He loves your dedication! You gain 10 gold."
+                    }
+                ]
+            },
+            {
+                character: "Nami 🧭",
+                name: "Nami",
+                text: "Nami has a clear navigation plan, but you spotted a new current that could save a whole day of travel. You're a bit nervous to challenge the navigator.",
+                choices: [
+                    {
+                        text: "You keep quiet. Nami is the expert, after all.",
+                        isSelfAdvocacy: false,
+                        resultText: "You stayed quiet, and the crew took the longer route. Your idea was a good one, but they'll never know if you don't share it."
+                    },
+                    {
+                        text: "Nami, your plan is solid, but I just noticed a strong current on the chart here that could be a shortcut. What do you think?",
+                        isSelfAdvocacy: true,
+                        reward: 10,
+                        resultText: "Nami is impressed by your sharp eyes and updates her plan. The crew cheers! You gain 10 gold."
+                    }
+                ]
+            },
+            {
+                character: "Luffy 🍖",
+                name: "Luffy",
+                text: "Luffy wants to play a game, but you're exhausted from a long watch. He's pestering you and doesn't seem to understand.",
+                choices: [
+                    {
+                        text: "You give in and play with him, even though you're tired.",
+                        isSelfAdvocacy: false,
+                        resultText: "You had a good time, but now you're even more exhausted. Taking care of your needs is a top priority."
+                    },
+                    {
+                        text: "Luffy, that sounds like a blast, but I'm beat. I need to rest now. Let's play a few rounds after I've had some rest!",
+                        isSelfAdvocacy: true,
+                        reward: 10,
+                        resultText: "Luffy nods and agrees, respecting your need to rest. He goes to find someone else to play with. You gain 10 gold."
+                    }
+                ]
+            },
+            {
+                character: "Usopp 🎯",
+                name: "Usopp",
+                text: "Usopp is trying out a new, loud contraption. The noise is bothering you and making it impossible to read your book.",
+                choices: [
+                    {
+                        text: "Hey, Usopp, that's really loud. It's hard for me to focus on my book. Do you mind moving your experiment somewhere else?",
+                        isSelfAdvocacy: false,
+                        resultText: "Usopp gets upset because he thinks you're being bossy. He refuses to move, and now you both feel a bit awkward. It's important to find a balance between advocating and being flexible."
+                    },
+                    {
+                        text: "You move to a different part of the ship to get away from the noise.",
+                        isSelfAdvocacy: true,
+                        reward: 15,
+                        resultText: "You found a new quiet spot to read. It's a great example of being flexible and finding a solution that works for you without causing conflict. You gain 15 gold."
+                    }
+                ]
+            },
+            {
+                character: "Chopper 🦌",
+                name: "Chopper",
+                text: "Chopper has been feeling unwell and is in a terrible mood. He snapped at you when you asked a question. It hurt your feelings.",
+                choices: [
+                    {
+                        text: "You brush it off and assume he's just stressed.",
+                        isSelfAdvocacy: false,
+                        resultText: "You didn't address the situation, and your feelings remained hurt. It's okay to let people know when they've upset you."
+                    },
+                    {
+                        text: "Chopper, it's okay if you're feeling sick, but please don't snap at me. It hurts my feelings. Let me know if you need anything.",
+                        isSelfAdvocacy: true,
+                        reward: 15,
+                        resultText: "Chopper apologizes profusely, saying he didn't mean it. He appreciates you being honest. You gain 15 gold."
+                    }
+                ]
+            },
+            {
+                character: "Robin 📚",
+                name: "Robin",
+                text: "Robin found a fascinating but difficult-to-understand book in a ruin. She asks for your help, but you're not sure you can be helpful.",
+                choices: [
+                    {
+                        text: "You pretend to be busy with something else to avoid the task.",
+                        isSelfAdvocacy: false,
+                        resultText: "You managed to avoid the task, but you missed out on an opportunity to collaborate and learn with a crewmate."
+                    },
+                    {
+                        text: "Robin, I'm not sure if I'm the best person to help you with this, but I'll give it my best shot. I'll read what I can and let you know my thoughts.",
+                        isSelfAdvocacy: true,
+                        reward: 15,
+                        resultText: "Robin is happy that you were honest about your capabilities but willing to try. You both make some progress! You gain 15 gold."
+                    }
+                ]
+            },
+            {
+                character: "Franky ⚙️",
+                name: "Franky",
+                text: "Franky wants to modify your personal belongings to make them 'SUPER!' but you like them the way they are. He is very excited about his new idea.",
+                choices: [
+                    {
+                        text: "You let him modify your things to not hurt his feelings.",
+                        isSelfAdvocacy: false,
+                        resultText: "Your belongings are 'SUPER!', but they're not what you wanted. Your feelings are valid and it is important to respect them."
+                    },
+                    {
+                        text: "Franky, that's a super cool idea, but I like my belongings just the way they are. I appreciate your offer though!",
+                        isSelfAdvocacy: true,
+                        reward: 15,
+                        resultText: "Franky is a little sad, but he gets it. He respects your decision and finds something else to work on. You gain 15 gold."
+                    }
+                ]
+            },
+            {
+                character: "Brook 🎻",
+                name: "Brook",
+                text: "Brook keeps playing the same song on his violin. You've heard it a hundred times and you're getting tired of it.",
+                choices: [
+                    {
+                        text: "Brook, I love your music, but I'm getting a bit tired of this song. Do you think you could play something else?",
+                        isSelfAdvocacy: false,
+                        resultText: "Brook gets a little sad, feeling you don't appreciate his music. While it's good to voice your feelings, sometimes a simple change of location is a better solution. No one's feelings were hurt, but it was a bit awkward."
+                    },
+                    {
+                        text: "You get up and leave the area without saying anything.",
+                        isSelfAdvocacy: true,
+                        reward: 15,
+                        resultText: "You got away from the repetitive song and found some peace. You listened to your needs and found a solution that works. You gain 15 gold."
+                    }
+                ]
+            },
+            {
+                character: "Ace 🔥",
+                name: "Ace",
+                text: "Ace, on a rare visit, is using his fire powers to cook a steak. He's getting dangerously close to some flammable ropes and supplies.",
+                choices: [
+                    {
+                        text: "You don't want to bother a powerful person like Ace, so you let him continue.",
+                        isSelfAdvocacy: false,
+                        resultText: "Ace's cooking almost set the whole ship on fire! You should have spoken up. Standing up for yourself and the group is important."
+                    },
+                    {
+                        text: "Ace, watch out! You're getting too close to the ropes! We could lose some supplies if you're not careful.",
+                        isSelfAdvocacy: true,
+                        reward: 15,
+                        resultText: "Ace thanks you for pointing out the danger and moves to a safer spot. The crew is safe! You gain 15 gold."
+                    }
+                ]
+            }
+        ];
+
+        // Special Scenario Logic
+        const specialScenarios = {
+            luffyHat: {
+                character: "Luffy 🍖",
+                name: "Luffy",
+                text: "Hey! You have a straw hat just like mine! Where did you find it? I thought I lost mine a long time ago.",
+                choices: [
+                    {
+                        text: "You explain that you bought it from a shop.",
+                        isSelfAdvocacy: true,
+                        reward: 10,
+                        resultText: "Luffy listens intently and then smiles. 'Oh, so there are others like mine out there! Awesome!' He's not mad at all and respects your honesty. You gain 10 gold."
+                    },
+                    {
+                        text: "You say 'I definitely took it from you.'",
+                        isSelfAdvocacy: false,
+                        resultText: "Luffy's smile turns to a pout. 'Hey! You can't just take my hat! That's not cool!' He gets a little upset, and you realize it's better to be honest."
+                    }
+                ]
+            },
+            sunnyModel: {
+                character: "Franky ⚙️",
+                name: "Franky",
+                text: "Hey! Is that a model of the Thousand Sunny you just bought?! SUUUPEEEER!",
+                choices: [
+                    {
+                        text: "You tell him you just wanted a souvenir.",
+                        isSelfAdvocacy: true,
+                        reward: 100,
+                        resultText: "Franky loves that you love his creation so much you'd buy a model of it. He gives you a bonus of 100 gold, yelling 'It's a gift from the shipwright!' You gain 100 gold."
+                    },
+                    {
+                        text: "You say you're buying it because you think his ship is lame.",
+                        isSelfAdvocacy: false,
+                        resultText: "Franky is heartbroken! He can't believe anyone would say such a thing. He walks away to sulk. Remember, kindness is a form of self-advocacy too."
+                    }
+                ]
+            }
+        };
+
+        // Shop Items
+        const shops = {
+            shop1: [
+                { name: "Luffy's Straw Hat Replica", cost: 10, description: "A cool-looking hat!", specialItem: 'luffyHat' },
+                { name: "Chopper's Rumble Ball", cost: 20, description: "Just a candy, hopefully...", specialItem: null },
+                { name: "Nami's Log Pose", cost: 30, description: "A must-have for any journey.", specialItem: null }
+            ],
+            shop2: [
+                { name: "Robin's Poneglyph Book", cost: 40, description: "For the curious adventurer." },
+                { name: "Gomu Gomu no Mi Replica", cost: 50, description: "Don't eat it!" },
+                { name: "Thousand Sunny Model", cost: 60, description: "A detailed replica of our ship.", specialItem: 'sunnyModel' }
+            ]
+        };
+
+        // DOM elements
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const shopScreen = document.getElementById('shop-screen');
+        const endScreen = document.getElementById('end-screen');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const characterIcon = document.getElementById('character-icon');
+        const characterName = document.getElementById('character-name');
+        const scenarioText = document.getElementById('scenario-text');
+        const choicesContainer = document.getElementById('choices-container');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const feedbackText = document.getElementById('feedback-text');
+        const nextBtn = document.getElementById('next-btn');
+        const scoreText = document.getElementById('score-text');
+        const finalMessage = document.getElementById('final-message');
+        const finalScore = document.getElementById('final-score');
+        const shopItemsContainer = document.getElementById('shop-items-container');
+        const shopMessage = document.getElementById('shop-message');
+        const shopContinueBtn = document.getElementById('shop-continue-btn');
+        const shopGoldDisplay = document.getElementById('shop-gold-display');
+        const messageBox = document.getElementById('message-box');
+        const messageBoxText = document.getElementById('message-box-text');
+        const messageBoxOk = document.getElementById('message-box-ok');
+        
+        let currentScenarioIndex = 0;
+        let score = 0;
+        let specialScenarioToLoad = null;
+        let specialLuffyBought = false;
+        let specialSunnyBought = false;
+
+        // Function to show a custom message box instead of alert()
+        function showMessage(text) {
+            messageBoxText.textContent = text;
+            messageBox.classList.remove('hidden');
+        }
+
+        // Event listener for the custom message box OK button
+        messageBoxOk.addEventListener('click', () => {
+            messageBox.classList.add('hidden');
+        });
+
+        function startGame() {
+            // Reset game state
+            currentScenarioIndex = 0;
+            score = 0;
+            specialScenarioToLoad = null;
+            specialLuffyBought = false;
+            specialSunnyBought = false;
+            updateScoreDisplay();
+
+            // Hide/Show screens
+            startScreen.classList.add('hidden');
+            shopScreen.classList.add('hidden');
+            endScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('fade-in');
+
+            loadScenario();
+        }
+
+        function loadScenario() {
+            // Check for and load a special scenario first
+            if (specialScenarioToLoad) {
+                const specialScenario = specialScenarios[specialScenarioToLoad];
+                characterIcon.textContent = specialScenario.character;
+                characterName.textContent = specialScenario.name;
+                scenarioText.textContent = specialScenario.text;
+                
+                choicesContainer.innerHTML = '';
+                feedbackContainer.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+
+                // Shuffle the choices for the special scenario
+                shuffleArray(specialScenario.choices).forEach(choice => {
+                    const choiceBtn = document.createElement('button');
+                    choiceBtn.classList.add('game-btn', 'bg-blue-500', 'text-white', 'hover:bg-blue-600', 'w-full', 'md:w-auto', 'fade-in');
+                    choiceBtn.textContent = choice.text;
+                    choiceBtn.onclick = () => handleChoice(choice, true); // Flag as special scenario choice
+                    choicesContainer.appendChild(choiceBtn);
+                });
+
+                specialScenarioToLoad = null;
+                return;
+            }
+
+            // Check for the shop trigger after the 5th and 10th scenarios
+            if (currentScenarioIndex === 5 || currentScenarioIndex === 10) {
+                showShop();
+                return;
+            }
+            
+            // Check if all scenarios have been played
+            if (currentScenarioIndex >= scenarios.length) {
+                endGame();
+                return;
+            }
+
+            const currentScenario = scenarios[currentScenarioIndex];
+
+            // Update UI elements for the new scenario
+            characterIcon.textContent = currentScenario.character;
+            characterName.textContent = currentScenario.name;
+            scenarioText.textContent = currentScenario.text;
+            
+            // Clear previous choices and feedback
+            choicesContainer.innerHTML = '';
+            feedbackContainer.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+
+            // Create buttons for each choice and re-enable them
+            // Shuffle the choices for regular scenarios
+            shuffleArray(currentScenario.choices).forEach(choice => {
+                const choiceBtn = document.createElement('button');
+                choiceBtn.classList.add('game-btn', 'bg-blue-500', 'text-white', 'hover:bg-blue-600', 'w-full', 'md:w-auto', 'fade-in');
+                choiceBtn.textContent = choice.text;
+                choiceBtn.onclick = () => handleChoice(choice, false);
+                choicesContainer.appendChild(choiceBtn);
+            });
+        }
+
+        function handleChoice(choice, isSpecial = false) {
+            // Disable all choice buttons to prevent multiple clicks
+            Array.from(choicesContainer.children).forEach(btn => btn.disabled = true);
+
+            // Give feedback based on the choice
+            feedbackText.textContent = choice.resultText;
+            feedbackContainer.classList.remove('hidden');
+            feedbackContainer.classList.add('fade-in');
+
+            // The logic for special scenarios is different. It doesn't affect the scenario index.
+            if (choice.isSelfAdvocacy) {
+                // If it's a special scenario, use the reward from the special scenario object
+                if (isSpecial) {
+                    score += choice.reward;
+                } else {
+                    // For regular scenarios, check the scenario index for the reward amount
+                    if (currentScenarioIndex >= 4) { // Scenarios 5-10 (indices 4-9) get 15 gold
+                        score += 15;
+                    } else { // Scenarios 1-4 (indices 0-3) get 10 gold
+                        score += 10;
+                    }
+                }
+            }
+
+            updateScoreDisplay();
+
+            // Show the next button
+            nextBtn.classList.remove('hidden');
+        }
+
+        function updateScoreDisplay() {
+            scoreText.textContent = `Score: ${score}`;
+        }
+        
+        function showShop() {
+            gameScreen.classList.add('hidden');
+            shopScreen.classList.remove('hidden');
+            shopScreen.classList.add('fade-in');
+            
+            // Update the gold display on the shop screen
+            shopGoldDisplay.textContent = `💰 ${score} Gold`;
+
+            shopMessage.classList.add('hidden');
+            shopItemsContainer.innerHTML = '';
+
+            const currentShop = currentScenarioIndex === 5 ? shops.shop1 : shops.shop2;
+
+            // Render shop items
+            currentShop.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('shop-item');
+                itemDiv.innerHTML = `
+                    <div class="flex flex-col items-start">
+                        <span class="font-bold text-gray-800">${item.name}</span>
+                        <span class="text-sm text-gray-500">${item.description}</span>
+                    </div>
+                    <button class="game-btn bg-green-500 text-white hover:bg-green-600 text-sm py-1 px-2 w-auto" data-cost="${item.cost}" data-special="${item.specialItem}">
+                        Buy (${item.cost}💰)
+                    </button>
+                `;
+                
+                // Add event listener to the buy button
+                const buyBtn = itemDiv.querySelector('button');
+                buyBtn.addEventListener('click', () => buyItem(item.name, item.cost, buyBtn, item.specialItem));
+                shopItemsContainer.appendChild(itemDiv);
+            });
+        }
+        
+        function buyItem(name, cost, button, specialItem) {
+            if (score >= cost) {
+                score -= cost;
+                updateScoreDisplay();
+                shopGoldDisplay.textContent = `💰 ${score} Gold`; // Update gold display immediately after purchase
+                shopMessage.textContent = `You bought a ${name}!`;
+                shopMessage.classList.remove('hidden', 'text-red-600');
+                shopMessage.classList.add('text-green-600');
+                button.disabled = true; // Disable the button after purchase
+                button.textContent = "Sold Out!";
+                
+                if (specialItem === 'luffyHat') {
+                    specialLuffyBought = true;
+                } else if (specialItem === 'sunnyModel') {
+                    specialSunnyBought = true;
+                }
+
+            } else {
+                shopMessage.textContent = `Not enough gold! You need ${cost - score} more.`;
+                shopMessage.classList.remove('hidden', 'text-green-600');
+                shopMessage.classList.add('text-red-600');
+            }
+        }
+
+        function endGame() {
+            gameScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            endScreen.classList.add('fade-in');
+
+            finalScore.textContent = `Your final score is: ${score} gold!`;
+
+            if (score === scenarios.length * 10) {
+                finalMessage.textContent = "You're a True Straw Hat!";
+            } else if (score >= scenarios.length * 5) {
+                finalMessage.textContent = "Great job, future pirate king!";
+            } else {
+                finalMessage.textContent = "Keep practicing!";
+            }
+        }
+
+        // Event Listeners for the main buttons
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+        
+        // Event listener for the new Next button
+        nextBtn.addEventListener('click', () => {
+            currentScenarioIndex++;
+            loadScenario();
+        });
+
+        // Event listener for the new Shop Continue button
+        shopContinueBtn.addEventListener('click', () => {
+            // Check for a special scene after the shops
+            if (currentScenarioIndex === 5 && specialLuffyBought) {
+                specialScenarioToLoad = 'luffyHat';
+                specialLuffyBought = false; // Reset the flag so it only happens once
+            } else if (currentScenarioIndex === 10 && specialSunnyBought) {
+                specialScenarioToLoad = 'sunnyModel';
+                specialSunnyBought = false; // Reset the flag so it only happens once
+            }
+
+            // Hide the shop and show the game screen, then load the next scenario
+            shopScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('fade-in');
+
+            // Only increment the index if we're not loading a special scenario
+            if (!specialScenarioToLoad) {
+                currentScenarioIndex++;
+            }
+            
+            // Check if all scenarios are done after the shop
+            if (currentScenarioIndex >= scenarios.length && !specialScenarioToLoad) {
+                endGame();
+            } else {
+                loadScenario();
+            }
+        });
+
+        // Ensure the game starts correctly on window load
+        window.onload = function() {
+            // The game state is already initialized and the start screen is visible by default.
+            // This ensures the logic is ready to run when the user clicks 'Set Sail!'.
+        };
+    </script>
+
+</body>
+</html>
